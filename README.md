@@ -2,11 +2,23 @@
 
 *"Optimización de la Gestión Energética y la Transición hacia Fuentes Renovables en Argentina: Desafíos y Oportunidades"*
 
-//## Features
-
 ## Tecnología
 
 **C** 
+
+## Datasets
+
+* Demanda de energía:
+
+Muestra la demanda de energía eléctrica por tipo de usuario y por año
+
+https://datos.gob.ar/dataset/ambiente-actividad-energetica/archivo/ambiente_31.1
+
+* Generación de energía:
+
+Indica la generación de energía según fuente de origen en Gigavatio-hora (GWh). La energía térmica contiene Biomasa y Biogás. La Hidráulica contiene hidro renovable. La renovable contiene la energía eólica y solar
+
+https://datos.gob.ar/dataset/ambiente-actividad-energetica/archivo/ambiente_31.2
 
 ## Documentación
 
