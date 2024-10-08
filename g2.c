@@ -12,7 +12,6 @@ struct consumoSector{
 	float consumo;
 };
 
-
 //Estructura del Nodo a utilizar en la Lista Doblemente Enlazada
 struct node{
 	struct consumoSector dato;
@@ -95,8 +94,8 @@ int main() {
 		printf("\n*** CONSUMO ENERGÉTICO ***\n");
 		printf("1. Mostrar Consumo Energético\n");
 		printf("2. Calcular consumo energético por sector\n");
-		printf("\n*** CONSUMO ENERGÉTICO ***\n");
-		printf("3. Mostrar Consumo Energético\n");
+		printf("\n*** FUENTES DE ENERGIA ***\n");
+		printf("3. Mostrar Fuentes de Energía\n");
 		printf("4. Calcular participación de fuentes de energía\n");
 		printf("5. Salir\n");
 		printf("\n---------------------------------\n");
@@ -127,7 +126,7 @@ int main() {
 		sleep(1000);
 		system("cls");
 		
-	} while (opcMenu != 3);
+	} while (opcMenu != 5);
 	
 	return 0;
 }
