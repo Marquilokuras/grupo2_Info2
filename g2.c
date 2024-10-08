@@ -87,7 +87,7 @@ int main() {
 	char archivoDatosConsumo[100] = "data/demandaEnergia.txt";  
 	char archivoDatosGeneracion[100] = "data/generacionFuente.txt"; 
 	//struct node* head = NULL;
-	//
+	//aaaaaaaaaa
 	do {
 		printf("\n*** MENU ACTIVIDAD ENERG�TICA ***\n");
 		printf("\n---------------------------------\n");
