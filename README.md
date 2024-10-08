@@ -2,10 +2,6 @@
 
 *"Optimización de la Gestión Energética y la Transición hacia Fuentes Renovables en Argentina: Desafíos y Oportunidades"*
 
-## Tecnología
-
-**C** 
-
 ## Datasets
 
 * Demanda de energía:
@@ -20,12 +16,16 @@ Indica la generación de energía según fuente de origen en Gigavatio-hora (GWh
 
 https://datos.gob.ar/dataset/ambiente-actividad-energetica/archivo/ambiente_31.2
 
+## Tecnología
+
+**C** 
+
 ## Documentación
 
 [Linear: Cronograma de Tareas](https://linear.app/headwarmers/team/HEA/all)
 
 ## Autores
 - [@Lucas Antún](https://github.com/LucasEntropy)
-- [@Federico Fernandez]()
+- [@Federico Fernandez](https://github.com/FedeeF)
 - [@Marcos Quinteros](https://github.com/Marquilokuras)
 - [@Pablo Valdez]()
