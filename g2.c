@@ -87,7 +87,7 @@ int main() {
 	int opcMenu = 0;
 	char archivoDatosConsumo[100] = "data/demandaEnergia.txt";  
 	char archivoDatosGeneracion[100] = "data/generacionFuente.txt"; 
-	struct node* head = NULL;
+	//struct node* head = NULL;
 	
 	do {
 		printf("\n*** MENU ACTIVIDAD ENERGÉTICA ***\n");
@@ -124,7 +124,7 @@ int main() {
 				break;
 		}
 		
-		Sleep(3000);
+		sleep(1000);
 		system("cls");
 		
 	} while (opcMenu != 3);
