@@ -12,48 +12,123 @@ struct consumoSector{
 	float consumo;
 };
 
-//Estructura del Nodo a utilizar en la Lista Doblemente Enlazada
+// Estructura del Nodo a utilizar en la Lista Doblemente Enlazada
 struct node{
 	struct consumoSector dato;
 	struct node *next;
 	struct node *prev;
 };
 
-// Estructura para almacenar los datos de la matriz energï¿½tica
-typedef struct {
-	char fuente[MAX_SECTOR];
-	float porcentaje;
-} FuenteEnergia;
+// Declaración de funciones
+void insertar(struct node **head, char *sector, float consumo);
+void mostrarConsumoEnergetico(struct node *head);
+void calcularConsumoPorSector(char *archivo, struct node **head);
+void calcularParticipacionFuente(char *archivo);
+void mostrarMenu();
 
+// Función para insertar en la lista doblemente enlazada
+void insertar(struct node **head, char *sector, float consumo) {
+	struct node *nuevo_nodo = (struct node*) malloc(sizeof(struct node));
+	strcpy(nuevo_nodo->dato.sector, sector);
+	nuevo_nodo->dato.consumo = consumo;
+	nuevo_nodo->next = NULL;
+	nuevo_nodo->prev = NULL;
+	
+	if (*head == NULL) {
+		*head = nuevo_nodo;
+	} else {
+		struct node *temp = *head;
+		while (temp->next != NULL) {
+			temp = temp->next;
+		}
+		temp->next = nuevo_nodo;
+		nuevo_nodo->prev = temp;
+	}
+}
 
-// Funciï¿½n para calcular el consumo energï¿½tico por sector
-void calcularConsumoPorSector(char *archivo) {
+// Función para mostrar la lista doblemente enlazada
+void mostrarConsumoEnergetico(struct node *head) {
+	
+	FILE *archivo = fopen("data/demandaEnergia.txt", "r");
+	
+	if (archivo == NULL) {
+		printf("No se pudo abrir el archivo.\n");
+		return;
+	}
+	
+	// Variables para almacenar cada valor
+	
+	char titulo_anio[20], titulo_residencial[20], titulo_comercial[20], titulo_industrial[30], titulo_unidad[15];
+	char anio[10], residencial[10], comercial[10], industrial_comercial_grande[10], unidad_medida[10];
+	
+	// Leer la primera línea (títulos)
+	fscanf(archivo, "\"%[^\"]\";\"%[^\"]\";\"%[^\"]\";\"%[^\"]\";\"%[^\"]\"\n", 
+		   titulo_anio, titulo_residencial, titulo_comercial, titulo_industrial, titulo_unidad);
+	
+	// Imprimir los títulos formateados
+	printf("%-6s | %-12s | %-10s | %-25s | %-12s\n", 
+		   titulo_anio, titulo_residencial, titulo_comercial, titulo_industrial, titulo_unidad);
+	printf("--------------------------------------------------------------------------\n");
+	
+	// Leer y mostrar los valores (segunda línea y siguientes)
+	while (fscanf(archivo, "\"%[^\"]\";\"%[^\"]\";\"%[^\"]\";\"%[^\"]\";\"%[^\"]\"\n", 
+				  anio, residencial, comercial, industrial_comercial_grande, unidad_medida) != EOF) {
+		// Imprimir los valores leídos
+		printf("%-6s | %-12s | %-10s | %-25s | %-12s\n", 
+			   anio, residencial, comercial, industrial_comercial_grande, unidad_medida);
+	}
+	
+	// Cerrar el archivo
+	fclose(archivo);
+	
+	/*if (head == NULL) {
+		printf("No hay datos de consumo disponibles.\n");
+		return;
+	}
+	
+	
+	printf("\nConsumo Energético por Sector:\n");
+	printf("%-20s %-10s\n", "Sector", "Consumo");
+	printf("----------------------------\n");
+	while (head != NULL) {
+		printf("%-20s %-10.2f GWh\n", head->dato.sector, head->dato.consumo);
+		head = head->next;
+	}*/
+	
+}
+
+// Función para calcular el consumo energético por sector (lectura desde archivo)
+void calcularConsumoPorSector(char *archivo, struct node **head) {
 	FILE *fp = fopen(archivo, "r");
 	if (!fp) {
 		printf("Error al abrir el archivo\n");
 		return;
 	}
 	
-	/*char line[MAX_LINE_LENGTH];
-	ConsumoSector sectores[10]; // Aquï¿½ se puede ajustar el nï¿½mero de sectores segï¿½n los datos
-	int i = 0;
+	char line[MAX_LINE_LENGTH];
+	int isFirstLine = 1;
 	
 	while (fgets(line, sizeof(line), fp)) {
-		// Procesar la lï¿½nea
-		// Aquï¿½ se debe extraer el sector y el consumo energï¿½tico
-		sscanf(line, "%[^,],%f", sectores[i].sector, &sectores[i].consumo);
-		i++;
+		// Ignorar la primera línea (encabezado)
+		if (isFirstLine) {
+			isFirstLine = 0;
+			continue;
+		}
+		
+		// Extraer los datos de cada línea
+		float consumo_residencial, consumo_comercial, consumo_industrial;
+		sscanf(line, "%*[^;];%f;%f;%f;%*s", &consumo_residencial, &consumo_comercial, &consumo_industrial);
+		
+		// Insertar en la lista por sector
+		insertar(head, "Residencial", consumo_residencial);
+		insertar(head, "Comercial", consumo_comercial);
+		insertar(head, "Industrial/Comercial Grande", consumo_industrial);
 	}
-	
-	// Mostrar los datos de consumo por sector
-	for (int j = 0; j < i; j++) {
-		printf("Sector: %s, Consumo: %.2f\n", sectores[j].sector, sectores[j].consumo);
-	}*/
 	
 	fclose(fp);
 }
 
-// Funciï¿½n para calcular la participaciï¿½n de las fuentes de energï¿½a
+// Función para calcular la participación de las fuentes de energía
 void calcularParticipacionFuente(char *archivo) {
 	FILE *fp = fopen(archivo, "r");
 	if (!fp) {
@@ -61,72 +136,93 @@ void calcularParticipacionFuente(char *archivo) {
 		return;
 	}
 	
-	/*char line[MAX_LINE_LENGTH];
-	FuenteEnergia fuentes[10]; // Aquï¿½ se puede ajustar el nï¿½mero de fuentes segï¿½n los datos
-	int i = 0;
+	// Ejemplo: Procesar el archivo de fuentes energéticas
+	// Aquí deberías adaptar el procesamiento según la estructura de tu archivo
+	char line[MAX_LINE_LENGTH];
+	int isFirstLine = 1;
 	
 	while (fgets(line, sizeof(line), fp)) {
-		// Procesar la lï¿½nea
-		// Aquï¿½ se debe extraer la fuente de energï¿½a y su porcentaje
-		sscanf(line, "%[^,],%f", fuentes[i].fuente, &fuentes[i].porcentaje);
-		i++;
+		// Ignorar la primera línea (encabezado)
+		if (isFirstLine) {
+			isFirstLine = 0;
+			continue;
+		}
+		
+		// Extraer los datos de cada línea
+		char fuente[MAX_SECTOR];
+		float porcentaje;
+		sscanf(line, "%[^;];%f", fuente, &porcentaje);
+		
+		// Mostrar los datos de la fuente de energía
+		printf("Fuente: %-20s Participación: %.2f%%\n", fuente, porcentaje);
 	}
-	
-	// Mostrar las fuentes y su participaciï¿½n
-	for (int j = 0; j < i; j++) {
-		printf("Fuente: %s, Participaciï¿½n: %.2f%%\n", fuentes[j].fuente, fuentes[j].porcentaje);
-	}
-	*/
 	
 	fclose(fp);
 }
 
-// Menï¿½ principal
-int main() {
+// Menú principal
+void mostrarMenu(struct node** head) {
 	int opcMenu = 0;
-	char archivoDatosConsumo[100] = "data/demandaEnergia.txt";  
-	char archivoDatosGeneracion[100] = "data/generacionFuente.txt"; 
-	//struct node* head = NULL;
-	//aaaaaaaaaa
+	char archivoDatosConsumo[100] = "data/demandaEnergia.txt";  // Archivo de datos de consumo energético
+	char archivoDatosGeneracion[100] = "data/generacionFuente.txt";  // Archivo de fuentes de energía
+	
 	do {
-		printf("\n*** MENU ACTIVIDAD ENERGï¿½TICA ***\n");
+		printf("\n*** MENU ACTIVIDAD ENERGETICA ***\n");
 		printf("\n---------------------------------\n");
-		printf("\n*** CONSUMO ENERGï¿½TICO ***\n");
-		printf("1. Mostrar Consumo Energï¿½tico\n");
-		printf("2. Calcular consumo energï¿½tico por sector\n");
+		printf("\n*** CONSUMO ENERGETICO ***\n");
+		printf("1. Mostrar Consumo Energetico\n");
+		printf("2. Calcular consumo energetico por sector\n");
 		printf("\n*** FUENTES DE ENERGIA ***\n");
-		printf("3. Mostrar Fuentes de Energï¿½a\n");
-		printf("4. Calcular participaciï¿½n de fuentes de energï¿½a\n");
+		printf("3. Mostrar Fuentes de Energia\n");
+		printf("4. Calcular participacion de fuentes de energia\n");
 		printf("5. Salir\n");
 		printf("\n---------------------------------\n");
-		printf("Seleccione una opciï¿½n: ");
+		printf("Seleccione una opcion: ");
 		scanf("%d", &opcMenu);
 		
 		switch(opcMenu) {
-			case 1:
-			
-				break;
-			case 2:
-				calcularConsumoPorSector(archivoDatosConsumo);
-				break;
-			case 3:
-			
-				break;
-			case 4:
-				calcularParticipacionFuente(archivoDatosGeneracion);
-				break;
-			case 5:
-				printf("\nSaliendo del programa...\n");
-				break;
-			default:
-				printf("\nOpciï¿½n invï¿½lida\n");
-				break;
+		case 1:
+			mostrarConsumoEnergetico(*head);
+			break;
+		case 2:
+			calcularConsumoPorSector(archivoDatosConsumo, head);
+			break;
+		case 3:
+			// Mostrar fuentes de energía
+			calcularParticipacionFuente(archivoDatosGeneracion);
+			break;
+		case 4:
+			// Calcular participación de fuentes de energía
+			calcularParticipacionFuente(archivoDatosGeneracion);
+			break;
+		case 5:
+			printf("\nSaliendo del programa...\n");
+			break;
+		default:
+			printf("\nOpción inválida\n");
+			break;
 		}
 		
-		sleep(1000);
-		system("cls");
+		//sleep(1); // Esperar 1 segundo antes de limpiar la pantalla
+		//system("clear"); // Limpiar la pantalla (usar "cls" en Windows)
 		
 	} while (opcMenu != 5);
+}
+
+
+int main() {
+	struct node* head = NULL;
+	// Cargar el consumo desde el archivo al inicio
+	calcularConsumoPorSector("data/demandaEnergia.txt", &head);
+	mostrarMenu(&head);
+	
+	// Liberar la memoria de la lista
+	struct node *temp;
+	while (head != NULL) {
+		temp = head;
+		head = head->next;
+		free(temp);
+	}
 	
 	return 0;
 }
