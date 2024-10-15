@@ -23,6 +23,7 @@ Lenguaje: **C**
 ## Documentación
 
 [Linear: Cronograma de Tareas](https://linear.app/headwarmers/team/HEA/all)
+
 [Canva: Presentación](https://www.canva.com/design/DAGTpRcvN28/IbuDyQvpIUUmfMv2Di7KOA/edit?utm_content=DAGTpRcvN28&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
 
 
