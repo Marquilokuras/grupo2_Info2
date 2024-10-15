@@ -9,7 +9,24 @@
 // Estructura para almacenar los datos de consumo por sector
 struct consumoSector{
 	char sector[MAX_SECTOR];
-	float consumo;
+	int anio;
+	int residencial;
+	int comercial;
+	int industrial;
+	char unidadMedida[5];
+};
+
+// Estructura para almacenar los datos de participacion de fuentes de energia
+struct fuentesEnergia{
+	char sector[MAX_SECTOR];
+	int anio;
+	char unidadMedida[5];
+	int energiaTermica;
+	int energiaHidraulica;
+	int energiaNuclear;
+	int energiaRenovable;
+	int importacion;
+	int energiaTotal;
 };
 
 // Estructura del Nodo a utilizar en la Lista Doblemente Enlazada
