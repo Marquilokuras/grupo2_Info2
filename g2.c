@@ -21,8 +21,10 @@ struct node{
 
 // Declaración de funciones
 void insertar(struct node **head, char *sector, float consumo);
-void mostrarConsumoEnergetico(struct node *head);
+void mostrarConsumoEnergetico(char *archivo);
 void calcularConsumoPorSector(char *archivo, struct node **head);
+void mostrarFuentesEnergia(char *archivo);
+
 void calcularParticipacionFuente(char *archivo);
 void mostrarMenu();
 
@@ -47,9 +49,9 @@ void insertar(struct node **head, char *sector, float consumo) {
 }
 
 // Función para mostrar la lista doblemente enlazada
-void mostrarConsumoEnergetico(struct node *head) {
+void mostrarConsumoEnergetico(char *archivoConsumo) {
 	
-	FILE *archivo = fopen("data/demandaEnergia.txt", "r");
+	FILE *archivo = fopen(archivoConsumo, "r");
 	
 	if (archivo == NULL) {
 		printf("No se pudo abrir el archivo.\n");
@@ -80,20 +82,6 @@ void mostrarConsumoEnergetico(struct node *head) {
 	
 	// Cerrar el archivo
 	fclose(archivo);
-	
-	/*if (head == NULL) {
-		printf("No hay datos de consumo disponibles.\n");
-		return;
-	}
-	
-	
-	printf("\nConsumo Energético por Sector:\n");
-	printf("%-20s %-10s\n", "Sector", "Consumo");
-	printf("----------------------------\n");
-	while (head != NULL) {
-		printf("%-20s %-10.2f GWh\n", head->dato.sector, head->dato.consumo);
-		head = head->next;
-	}*/
 	
 }
 
@@ -126,6 +114,41 @@ void calcularConsumoPorSector(char *archivo, struct node **head) {
 	}
 	
 	fclose(fp);
+}
+
+void mostrarFuentesEnergia(char *archivoFuente) {
+	
+	FILE *archivo = fopen(archivoFuente, "r");
+	
+	if (archivo == NULL) {
+		printf("No se pudo abrir el archivo.\n");
+		return;
+	}
+	
+	// Variables para almacenar cada valor
+	char titulo_anio[20], titulo_unidad[20], titulo_energia_termica[20], titulo_energia_hidraulica[30], titulo_energia_nuclear[15],titulo_energia_renovable[15],titulo_importacion[15],titulo_energia_total[20];
+	char anio[10], unidad[10], energiaTermica[10], energiaHidraulica[10], energiaNuclear[10],energiaRenovable[10],importacion[10],energiaTotal[10];
+	
+	// Leer la primera línea (títulos)
+	fscanf(archivo, "\"%[^\"]\";\"%[^\"]\";\"%[^\"]\";\"%[^\"]\";\"%[^\"]\";\"%[^\"]\";\"%[^\"]\";\"%[^\"]\"\n",
+		   titulo_anio, titulo_unidad, titulo_energia_termica, titulo_energia_hidraulica, titulo_energia_nuclear, titulo_energia_renovable, titulo_importacion, titulo_energia_total);
+	
+	
+	// Imprimir los títulos formateados
+	printf("Anio  | Unidad     | Energia Termica | Energia Hidraulica  | Energia Nuclear   | Energia Renovable  | Importacion   | Energia Total\n");
+	printf("-------------------------------------------------------------------------------------------------------------------------------\n");
+	
+	// Leer y mostrar los valores (segunda línea y siguientes)
+	while (fscanf(archivo, "\"%[^\"]\";\"%[^\"]\";\"%[^\"]\";\"%[^\"]\";\"%[^\"]\";\"%[^\"]\";\"%[^\"]\";\"%[^\"]\"\n",
+				  anio, unidad, energiaTermica, energiaHidraulica, energiaNuclear, energiaRenovable, importacion, energiaTotal) != EOF) {
+		
+		printf("%-6s | %-10s | %-15s | %-18s | %-16s | %-17s | %-13s | %-12s\n",
+			   anio, unidad, energiaTermica, energiaHidraulica, energiaNuclear, energiaRenovable, importacion, energiaTotal);
+	}
+	
+	// Cerrar el archivo
+	fclose(archivo);
+	
 }
 
 // Función para calcular la participación de las fuentes de energía
@@ -179,17 +202,17 @@ void mostrarMenu(struct node** head) {
 		printf("\n---------------------------------\n");
 		printf("Seleccione una opcion: ");
 		scanf("%d", &opcMenu);
-		
+		printf("\n");
 		switch(opcMenu) {
 		case 1:
-			mostrarConsumoEnergetico(*head);
+			mostrarConsumoEnergetico(archivoDatosConsumo);
 			break;
 		case 2:
 			calcularConsumoPorSector(archivoDatosConsumo, head);
 			break;
 		case 3:
 			// Mostrar fuentes de energía
-			calcularParticipacionFuente(archivoDatosGeneracion);
+			mostrarFuentesEnergia(archivoDatosGeneracion);
 			break;
 		case 4:
 			// Calcular participación de fuentes de energía
@@ -212,8 +235,7 @@ void mostrarMenu(struct node** head) {
 
 int main() {
 	struct node* head = NULL;
-	// Cargar el consumo desde el archivo al inicio
-	calcularConsumoPorSector("data/demandaEnergia.txt", &head);
+	
 	mostrarMenu(&head);
 	
 	// Liberar la memoria de la lista
