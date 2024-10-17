@@ -140,38 +140,25 @@ void calcularConsumoPorSector(char *archivo, struct node *head) {
     fclose(fp);
 }
 
-//Función que inserta los datos a la lista
-void insertar(struct node **head, char *sector, int residencial, int comercial, int industrial) {
-    struct node *temp = *head;
+void insertar(struct node *head, char *sector, float consumo) {
+    struct node *temp = head;
     
     // Verificar si el sector ya está en la lista
     while (temp != NULL) {
         if (strcmp(temp->sector, sector) == 0) {
             // Si el sector ya existe, sumamos los consumos
-            temp->residencial += residencial;
-            temp->comercial += comercial;
-            temp->industrial += industrial;
+            temp->consumo += consumo;
             return;
         }
         temp = temp->next;
     }
-    
-    // Si el sector no está, creamos un nuevo nodo
-    struct node *newNode = (struct node*)malloc(sizeof(struct node));
-    if (newNode == NULL) {
-        printf("Error al asignar memoria\n");
-        return;
-    }
-    
-    // Inicializamos el nuevo nodo
-    strcpy(newNode->sector, sector);
-    newNode->residencial = residencial;
-    newNode->comercial = comercial;
-    newNode->industrial = industrial;
-    newNode->next = *head;  // Insertar al principio de la lista
-    
-    // Actualizar la cabeza de la lista
-    *head = newNode;
+
+    // Si no se encontró el sector, crear un nuevo nodo
+    struct node *nuevo = (struct node*)malloc(sizeof(struct node));
+    strcpy(nuevo->sector, sector);
+    nuevo->consumo = consumo;
+    nuevo->next = head;
+    head = nuevo;
 }
 
 void mostrarFuentesEnergia(char *archivoFuente) {
