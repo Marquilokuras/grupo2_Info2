@@ -44,27 +44,6 @@ void mostrarFuentesEnergia(char *archivo);
 void calcularParticipacionFuente(char *archivo);
 void mostrarMenu();
 
-// Funci�n para insertar en la lista doblemente enlazada
-void insertar(struct node **head, char *sector, float consumo) {
-/*	struct node *nuevo_nodo = (struct node*) malloc(sizeof(struct node));
-	strcpy(nuevo_nodo->dato.sector, sector);
-	nuevo_nodo->dato.sector = ' ';
-	nuevo_nodo->next = NULL;
-	nuevo_nodo->prev = NULL;
-	
-	if (*head == NULL) {
-		*head = nuevo_nodo;
-	} else {
-		struct node *temp = *head;
-		while (temp->next != NULL) {
-			temp = temp->next;
-		}
-		temp->next = nuevo_nodo;
-		nuevo_nodo->prev = temp;
-	}
-	*/
-}
-
 // Funci�n para mostrar la lista doblemente enlazada
 void mostrarConsumoEnergetico(char *archivoConsumo) {
 	
@@ -102,63 +81,91 @@ void mostrarConsumoEnergetico(char *archivoConsumo) {
 	
 }
 
+void insertar(struct node **head, char *sector, float consumo) {
+    struct node *nuevo_nodo = (struct node*)malloc(sizeof(struct node));
+    
+    if (!nuevo_nodo) {
+        printf("Error al asignar memoria\n");
+        return;
+    }
+
+    // Inicializar el nuevo nodo
+    strcpy(nuevo_nodo->dato.sector, sector);
+    nuevo_nodo->dato.residencial = (strcmp(sector, "Residencial") == 0) ? consumo : 0.0;
+    nuevo_nodo->dato.comercial = (strcmp(sector, "Comercial") == 0) ? consumo : 0.0;
+    nuevo_nodo->dato.industrial = (strcmp(sector, "Industrial/Comercial Grande") == 0) ? consumo : 0.0;
+
+    nuevo_nodo->next = NULL;
+    nuevo_nodo->prev = NULL;
+
+    // Verificar si la lista está vacía
+    if (*head == NULL) {
+        *head = nuevo_nodo;
+    } else {
+        struct node *temp = *head;
+        struct node *prev = NULL;
+
+        // Buscar si el sector ya existe
+        while (temp != NULL) {
+            // Si el sector ya existe, actualizar el consumo
+            if (strcmp(temp->dato.sector, sector) == 0) {
+                if (strcmp(sector, "Residencial") == 0) {
+                    temp->dato.residencial += consumo;  // Sumar al consumo existente
+                } else if (strcmp(sector, "Comercial") == 0) {
+                    temp->dato.comercial += consumo;  // Sumar al consumo existente
+                } else if (strcmp(sector, "Industrial/Comercial Grande") == 0) {
+                    temp->dato.industrial += consumo;  // Sumar al consumo existente
+                }
+                free(nuevo_nodo);  // Liberar la memoria del nuevo nodo
+                return;
+            }
+            prev = temp;
+            temp = temp->next;
+        }
+
+        // Si el sector no existe, agregar el nuevo nodo al final de la lista
+        prev->next = nuevo_nodo;
+        nuevo_nodo->prev = prev;
+    }
+
+    printf("Nodo insertado: %s - Consumo: %.2f\n", sector, consumo);
+}
+
 // Funci�n para calcular el consumo energ�tico por sector (lectura desde archivo)
-void calcularConsumoPorSector(char *archivo, struct node *head) {
+void calcularConsumoPorSector(char *archivo, struct node **head) {
     FILE *fp = fopen(archivo, "r");
     if (!fp) {
         printf("Error al abrir el archivo\n");
         return;
     }
-    
+
     char line[MAX_LINE_LENGTH];
     int isFirstLine = 1;
-    float consumoComercial = 0.0, consumoIndustrial = 0.0, consumoResidencial = 0.0;
+    double consumoComercial = 0.0, consumoIndustrial = 0.0, consumoResidencial = 0.0;
 
     while (fgets(line, sizeof(line), fp)) {
-        // Ignorar la primera línea (encabezado)
         if (isFirstLine) {
             isFirstLine = 0;
             continue;
         }
-        
-        // Extraer los datos de cada línea
+
         char residencial[10], comercial[10], industrialComercialGrande[10];
-        
+
         if (sscanf(line, "\"%[^\"]\";\"%[^\"]\";\"%[^\"]\"\n", residencial, comercial, industrialComercialGrande) == 3) {
-            // Convertir a float
             consumoResidencial += atof(residencial);
             consumoComercial += atof(comercial);
             consumoIndustrial += atof(industrialComercialGrande);
+        } else {
+            printf("Error al leer la línea: %s\n", line);
         }
     }
 
-    // Insertar en la lista por sector
     insertar(head, "Residencial", consumoResidencial);
     insertar(head, "Comercial", consumoComercial);
     insertar(head, "Industrial/Comercial Grande", consumoIndustrial);
 
     fclose(fp);
-}
-
-void insertar(struct node *head, char *sector, float consumo) {
-    struct node *temp = head;
-    
-    // Verificar si el sector ya está en la lista
-    while (temp != NULL) {
-        if (strcmp(temp->sector, sector) == 0) {
-            // Si el sector ya existe, sumamos los consumos
-            temp->consumo += consumo;
-            return;
-        }
-        temp = temp->next;
-    }
-
-    // Si no se encontró el sector, crear un nuevo nodo
-    struct node *nuevo = (struct node*)malloc(sizeof(struct node));
-    strcpy(nuevo->sector, sector);
-    nuevo->consumo = consumo;
-    nuevo->next = head;
-    head = nuevo;
+    printf("Lectura de archivo completada\n");
 }
 
 void mostrarFuentesEnergia(char *archivoFuente) {
@@ -253,7 +260,7 @@ void mostrarMenu(struct node** head) {
 			mostrarConsumoEnergetico(archivoDatosConsumo);
 			break;
 		case 2:
-			calcularConsumoPorSector(archivoDatosConsumo, *head);
+			calcularConsumoPorSector(archivoDatosConsumo, head);
 			break;
 		case 3:
 			// Mostrar fuentes de energ�a
