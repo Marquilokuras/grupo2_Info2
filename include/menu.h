@@ -3,6 +3,6 @@
 
 #include "lista.h"
 
-void mostrarMenu(struct node** head);
+void mostrarMenu(struct node **headConsumo, struct Node **headFuente);
 
 #endif
